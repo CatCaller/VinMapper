@@ -305,5 +305,3 @@ ULONG64 VinMapper::MapDriver(BYTE* data, ULONG64 param1, ULONG64 param2, bool fr
 
 	return 0;
 }
-
-

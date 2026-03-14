@@ -99,7 +99,7 @@ void PauseIfParentIsExplorer() {
 
 void help() {
 	VinLog(L"\r\n\r\n[!] Incorrect Usage!" << std::endl);
-	VinLog(L"[+] Usage: VinMapper.exe [--free][--indPages][--PassAllocationPtr][--copy-header]");
+	VinLog(L"[+] Usage: VinMapper.exe [--free]");
 
 #ifdef PDB_OFFSETS
 	VinLog(L"[--dontUpdateOffsets [--offsetsPath \"FilePath\"]]"); 
@@ -114,25 +114,16 @@ int wmain(const int argc, wchar_t** argv) {
 	SetUnhandledExceptionFilter(SimplestCrashHandler);
 
 	bool free = paramExists(argc, argv, L"free") > 0;
-	bool indPagesMode = paramExists(argc, argv, L"indPages") > 0;
-	bool passAllocationPtr = paramExists(argc, argv, L"PassAllocationPtr") > 0;
-	bool copyHeader = paramExists(argc, argv, L"copy-header") > 0;
+	constexpr bool indPagesMode = true;
+	constexpr bool passAllocationPtr = true;
+	constexpr bool copyHeader = false;
 
 	if (free) {
 		VinLog(L"[+] Free memory after driver execution enabled" << std::endl);
 	}
 
-	if (indPagesMode) {
-		VinLog(L"[+] Allocate Independent Pages mode enabled" << std::endl);
-	}
-
-	if (passAllocationPtr) {
-		VinLog(L"[+] Pass Allocation Ptr as first param enabled" << std::endl);
-	}
-
-	if (copyHeader) {
-		VinLog(L"[+] Copying driver header enabled" << std::endl);
-	}
+	VinLog(L"[+] Allocate Independent Pages mode enabled" << std::endl);
+	VinLog(L"[+] Pass Allocation Ptr as first param enabled" << std::endl);
 
 #ifdef PDB_OFFSETS
 	bool UpdateOffset = !(paramExists(argc, argv, L"dontUpdateOffsets") > 0);
