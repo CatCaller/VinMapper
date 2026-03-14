@@ -11,10 +11,6 @@
 #include "utils.hpp"
 #include "intel_driver.hpp"
 
-#ifdef PDB_OFFSETS
-#include "KDSymbolsHandler.h"
-#endif
-
 LONG WINAPI SimplestCrashHandler(EXCEPTION_POINTERS* ExceptionInfo)
 {
 	if (ExceptionInfo && ExceptionInfo->ExceptionRecord)
@@ -100,10 +96,6 @@ void PauseIfParentIsExplorer() {
 void help() {
 	VinLog(L"\r\n\r\n[!] Incorrect Usage!" << std::endl);
 	VinLog(L"[+] Usage: VinMapper.exe [--free]");
-
-#ifdef PDB_OFFSETS
-	VinLog(L"[--dontUpdateOffsets [--offsetsPath \"FilePath\"]]"); 
-#endif
 	
 	VinLog(L" driver" << std::endl);
 
@@ -125,23 +117,6 @@ int wmain(const int argc, wchar_t** argv) {
 	VinLog(L"[+] Allocate Independent Pages mode enabled" << std::endl);
 	VinLog(L"[+] Pass Allocation Ptr as first param enabled" << std::endl);
 
-#ifdef PDB_OFFSETS
-	bool UpdateOffset = !(paramExists(argc, argv, L"dontUpdateOffsets") > 0);
-	int FilePathParamIdx = paramExists(argc, argv, L"offsetsPath");
-	std::wstring offsetFilePath = VinUtils::GetCurrentAppFolder() + L"\\offsets.ini";
-
-	if (UpdateOffset && FilePathParamIdx > 0) {
-		VinLog("[-] Can't set --offsetsPath without set --dontUpdateOffsets" << std::endl);
-		help();
-		return -1;
-	}
-
-	if (FilePathParamIdx > 0) {
-		offsetFilePath = argv[FilePathParamIdx + 1];
-		VinLog("[+] Setting Offsets File Path To: " << offsetFilePath << std::endl);
-	}
-#endif
-
 	int drvIndex = -1;
 	for (int i = 1; i < argc; i++) {
 		if (std::filesystem::path(argv[i]).extension().string().compare(".sys") == 0) {
@@ -162,15 +137,6 @@ int wmain(const int argc, wchar_t** argv) {
 		PauseIfParentIsExplorer();
 		return -1;
 	}
-
-#ifdef PDB_OFFSETS
-		if (!KDSymbolsHandler::GetInstance()->ReloadFile(offsetFilePath, UpdateOffset ? VinUtils::GetCurrentAppFolder() + L"\\" + SYM_FROM_PDB_EXE : L"")) {
-		VinLog(L"[-] Error: Failed To Get Symbols Info." << std::endl);
-		PauseIfParentIsExplorer();
-		return -1;
-	}
-#endif
-
 	if (!NT_SUCCESS(intel_driver::Load())) {
 		PauseIfParentIsExplorer();
 		return -1;
